@@ -39,8 +39,8 @@ def batch_processing(batch_size):
                 yield user  # Yield only users over age 25
 
 # Optional test run
-if __name__ == "__main__":
-    for filtered_batch in batch_processing(5):  # Loop 3
-        print("Filtered batch:")
-        for user in filtered_batch:
-            print(user)
+#if __name__ == "__main__":
+#    for filtered_batch in batch_processing(5):  # Loop 3
+#        print("Filtered batch:")
+#        for user in filtered_batch:
+#            print(user)
