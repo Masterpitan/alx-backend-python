@@ -14,7 +14,7 @@ class TestGithubOrgClient(unittest.TestCase):
     ])
     @patch("client.get_json")
     def test_org(self, org_name, mock_get_json):
-        """Test that GithubOrgClient.org calls json and returns result expected"""
+        """Test that GithubOrgClient.org calls json, and returns result expected"""
         # Arrange: fake payload to return from get_json
         expected_payload = {"login": org_name}
         mock_get_json.return_value = expected_payload
@@ -43,16 +43,18 @@ class TestGithubOrgClient(unittest.TestCase):
     @patch("client.get_json")
     def test_public_repos(self, mock_get_json):
         """Test public_repos method with mocked payload and URL"""
-
         test_repos_payload = [
             {"name": "repo1"},
             {"name": "repo2"},
             {"name": "repo3"},
         ]
-
         mock_get_json.return_value = test_repos_payload
 
-        with patch.object(GithubOrgClient, "_public_repos_url", new_callable=PropertyMock) as mock_url:
+        with patch.object(
+            GithubOrgClient,
+            "_public_repos_url",
+            new_callable=PropertyMock
+        ) as mock_url:
             mock_url.return_value = "https://fake-url.com"
 
             client = GithubOrgClient("test_org")
