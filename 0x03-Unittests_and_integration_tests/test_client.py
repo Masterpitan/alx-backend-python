@@ -7,7 +7,7 @@ from unittest.mock import patch, PropertyMock
 
 """Unit test for client.GitHubOrgClient"""
 
-"""Defining the class"""
+
 class TestGithubOrgClient(unittest.TestCase):
 
     @parameterized.expand([
