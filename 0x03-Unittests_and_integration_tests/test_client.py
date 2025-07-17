@@ -29,7 +29,6 @@ class TestGithubOrgClient(unittest.TestCase):
         self.assertEqual(result, expected_payload)
         mock_get_json.assert_called_once_with(f"https://api.github.com/orgs/{org_name}")
 
-
     def test_public_repos_url(self):
         """Test that _public_repos_url
         returns mocked repos_url"""
@@ -39,7 +38,7 @@ class TestGithubOrgClient(unittest.TestCase):
             GithubOrgClient,
             "org",
             new_callable=PropertyMock
-            ) as mock_org:
+        ) as mock_org:
             mock_org.return_value = test_payload
 
             client = GithubOrgClient("test_org")
