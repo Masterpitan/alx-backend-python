@@ -28,6 +28,8 @@ class TestGithubOrgClient(unittest.TestCase):
         result = client.org
 
         # Assert
+        """Assert your test, sotre url in variable
+        and assign to mock_get_json"""
         self.assertEqual(result, expected_payload)
         url_display = f"https://api.github.com/orgs/{org_name}"
         mock_get_json.assert_called_once_with(url_display)
