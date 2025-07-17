@@ -1,14 +1,25 @@
 #!/usr/bin/env python3
 """We start by importing modules needed"""
 import unittest
-from parameterized import parameterized
+from parameterized import parameterized, parameterized_class
 from client import GithubOrgClient
-from unittest.mock import patch, PropertyMock
+from unittest.mock import patch, PropertyMock, Mock
+from fixtures import TEST_PAYLOAD
 
 """Unit test for client.GitHubOrgClient
 define a class and functions"""
 
+PARAMS = [
+    {
+        "org_payload": org,
+        "repos_payload": repos,
+        "expected_repos": expected,
+        "apache2_repos": apache
+    }
+    for org, repos, expected, apache in TEST_PAYLOAD
+]
 
+@parameterized_class(PARAMS)
 class TestGithubOrgClient(unittest.TestCase):
     """This is unittest for TestGithubOrgClient"""
 
@@ -85,11 +96,29 @@ class TestGithubOrgClient(unittest.TestCase):
         """Test the has_license static method."""
         result = GithubOrgClient.has_license(repo, license_key)
         self.assertEqual(result, expected)
-    @parameterized.expand([
-        ({"license": {"key": "my_license"}}, "my_license", True),
-        ({"license": {"key": "other_license"}}, "my_license", False),
-    ])
-    def test_has_license(self, repo, license_key, expected):
-        """Test the has_license method"""
-        client = GithubOrgClient("test_org")
-        self.assertEqual(client.has_license(repo, license_key), expected)
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up class-level patch for get_json to return test payloads"""
+        cls.get_patcher = patch('client.get_json')
+        cls.mock_get_json = cls.get_patcher.start()
+
+        # Directly return dictionaries, not mock response objects
+        cls.mock_get_json.side_effect = [
+            cls.org_payload,     # for self.org
+            cls.repos_payload    # for self.repos_payload
+        ]
+
+
+    @classmethod
+    def tearDownClass(cls):
+        """Stop patching"""
+        cls.get_patcher.stop()
+
+
+    def test_public_repos(self):
+        """Test something using self.org_payload, etc."""
+
+        client = GithubOrgClient("google")
+        repos = client.public_repos()
+        self.assertEqual(repos, self.expected_repos)
