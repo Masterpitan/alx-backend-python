@@ -8,13 +8,15 @@ from unittest.mock import patch, PropertyMock
 
 class TestGithubOrgClient(unittest.TestCase):
 
+
     @parameterized.expand([
         ("google",),
         ("abc",),
     ])
     @patch("client.get_json")
     def test_org(self, org_name, mock_get_json):
-        """Test that GithubOrgClient.org calls json, and returns result expected"""
+        """Test that GithubOrgClient.org calls json,
+            and returns result expected"""
         # Arrange: fake payload to return from get_json
         expected_payload = {"login": org_name}
         mock_get_json.return_value = expected_payload
@@ -29,10 +31,15 @@ class TestGithubOrgClient(unittest.TestCase):
 
 
     def test_public_repos_url(self):
-        """Test that _public_repos_url returns mocked repos_url"""
+        """Test that _public_repos_url
+        returns mocked repos_url"""
         test_payload = {"repos_url": "https://api.github.com/orgs/test_org/repos"}
 
-        with patch.object(GithubOrgClient, "org", new_callable=PropertyMock) as mock_org:
+        with patch.object(
+            GithubOrgClient,
+            "org",
+            new_callable=PropertyMock
+            ) as mock_org:
             mock_org.return_value = test_payload
 
             client = GithubOrgClient("test_org")
@@ -42,7 +49,8 @@ class TestGithubOrgClient(unittest.TestCase):
 
     @patch("client.get_json")
     def test_public_repos(self, mock_get_json):
-        """Test public_repos method with mocked payload and URL"""
+        """Test public_repos method
+        with mocked payload and URL"""
         test_repos_payload = [
             {"name": "repo1"},
             {"name": "repo2"},
