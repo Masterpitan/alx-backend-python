@@ -27,12 +27,14 @@ class TestGithubOrgClient(unittest.TestCase):
 
         # Assert
         self.assertEqual(result, expected_payload)
-        mock_get_json.assert_called_once_with(f"https://api.github.com/orgs/{org_name}")
+        url_display = f"https://api.github.com/orgs/{org_name}"
+        mock_get_json.assert_called_once_with(url_display)
 
     def test_public_repos_url(self):
         """Test that _public_repos_url
         returns mocked repos_url"""
-        test_payload = {"repos_url": "https://api.github.com/orgs/test_org/repos"}
+        repos_url = "https://api.github.com/orgs/test_org/repos"
+        test_payload = {"repos_url": repos_url}
 
         with patch.object(
             GithubOrgClient,
