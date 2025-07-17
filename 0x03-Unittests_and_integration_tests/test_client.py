@@ -6,8 +6,8 @@ from unittest.mock import patch, PropertyMock
 
 """Unit test for client.GitHubOrgClient"""
 
-class TestGithubOrgClient(unittest.TestCase):
 
+class TestGithubOrgClient(unittest.TestCase):
 
     @parameterized.expand([
         ("google",),
