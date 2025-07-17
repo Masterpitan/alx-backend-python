@@ -99,7 +99,8 @@ class TestGithubOrgClient(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """Set up class-level patch for get_json to return test payloads"""
+        """Set up class-level patch for get_json
+        to return test payloads"""
         cls.get_patcher = patch('client.get_json')
         cls.mock_get_json = cls.get_patcher.start()
 
