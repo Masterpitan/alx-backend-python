@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""We start by importing modules needed"""
 import unittest
 from parameterized import parameterized
 from client import GithubOrgClient
@@ -30,6 +31,7 @@ class TestGithubOrgClient(unittest.TestCase):
         url_display = f"https://api.github.com/orgs/{org_name}"
         mock_get_json.assert_called_once_with(url_display)
 
+    """Defining the functions"""
     def test_public_repos_url(self):
         """Test that _public_repos_url
         returns mocked repos_url"""
