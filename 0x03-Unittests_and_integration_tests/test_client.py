@@ -7,7 +7,7 @@ from unittest.mock import patch, PropertyMock
 
 """Unit test for client.GitHubOrgClient"""
 
-
+"""Defining the class"""
 class TestGithubOrgClient(unittest.TestCase):
 
     @parameterized.expand([
@@ -18,7 +18,7 @@ class TestGithubOrgClient(unittest.TestCase):
     def test_org(self, org_name, mock_get_json):
         """Test that GithubOrgClient.org calls json,
             and returns result expected"""
-        # Arrange: fake payload to return from get_json
+        """Arrange: fake payload to return from get_json"""
         expected_payload = {"login": org_name}
         mock_get_json.return_value = expected_payload
 
