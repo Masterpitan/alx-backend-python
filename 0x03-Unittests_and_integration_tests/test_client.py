@@ -93,33 +93,27 @@ class TestGithubOrgClient(unittest.TestCase):
         ({"license": {"key": "other_license"}}, "my_license", False),
     ])
     def test_has_license(self, repo, license_key, expected):
-        """Test the has_license static method."""
         result = GithubOrgClient.has_license(repo, license_key)
         self.assertEqual(result, expected)
 
     @classmethod
     def setUpClass(cls):
         cls.get_patcher = patch('client.get_json')
-        cls.mock_get_json = cls.get_patcher.start()
-        cls.mock_get_json.return_value = cls.repos_payload
+        cls.mock = cls.get_patcher.start()
+        def side_effect(url):
+            if url == "https://api.github.com/orgs/google":
+                return cls.org_payload
+            return cls.repos_payload
+        cls.mock.side_effect = side_effect
 
     @classmethod
     def tearDownClass(cls):
         cls.get_patcher.stop()
 
-
     def test_public_repos(self):
-        with patch.object(GithubOrgClient, "repos_payload",
-                          new_callable=PropertyMock) as mock_repos:
-            mock_repos.return_value = self.repos_payload
-            client = GithubOrgClient("google")
-            repos = client.public_repos()
-            self.assertEqual(repos, self.expected_repos)
+        client = GithubOrgClient("google")
+        self.assertEqual(client.public_repos(), self.expected_repos)
 
     def test_public_repos_with_license(self):
-        with patch.object(GithubOrgClient, "repos_payload",
-                          new_callable=PropertyMock) as mock_repos:
-            mock_repos.return_value = self.repos_payload
-            client = GithubOrgClient("google")
-            repos = client.public_repos(license="apache-2.0")
-            self.assertEqual(repos, self.apache2_repos)
+        client = GithubOrgClient("google")
+        self.assertEqual(client.public_repos(license="apache-2.0"), self.apache2_repos)
