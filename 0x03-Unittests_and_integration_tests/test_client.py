@@ -104,12 +104,13 @@ class TestGithubOrgClient(unittest.TestCase):
         cls.get_patcher = patch('client.get_json')
         cls.mock_get_json = cls.get_patcher.start()
 
-        # Directly return dictionaries, not mock response objects
-        cls.mock_get_json.side_effect = [
-            cls.org_payload,     # for self.org
-            cls.repos_payload    # for self.repos_payload
-        ]
+        # Configure the mock to return appropriate values
+        def side_effect(url):
+            if url == f"https://api.github.com/orgs/google":
+                return cls.org_payload
+            return cls.repos_payload
 
+        cls.mock_get_json.side_effect = side_effect
 
     @classmethod
     def tearDownClass(cls):
@@ -118,8 +119,16 @@ class TestGithubOrgClient(unittest.TestCase):
 
 
     def test_public_repos(self):
-        """Test something using self.org_payload, etc."""
-
+        """Test that GithubOrgClient.public_repos returns the expected list
+        of repos based on the fixtures"""
         client = GithubOrgClient("google")
         repos = client.public_repos()
         self.assertEqual(repos, self.expected_repos)
+        self.mock_get_json.assert_called
+
+    def test_public_repos_with_license(self):
+        """Test that GithubOrgClient.public_repos with license filter
+        returns the correct repos"""
+        client = GithubOrgClient("google")
+        repos = client.public_repos(license="apache-2.0")
+        self.assertEqual(repos, self.apache2_repos)
