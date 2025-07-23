@@ -15,7 +15,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
     filterset_fields = ['participants']  # Filter by user ID in participants
 
     def get_queryset(self):
-        return self.queryset.filter(participants=self.request.user)
+        return Conversation.objects.filter(participants=self.request.user)
 
     def create(self, request, *args, **kwargs):
         participants = request.data.get('participants', [])
