@@ -45,7 +45,7 @@ class MessageViewSet(viewsets.ModelViewSet):
         return MessageSerializer
 
     def get_queryset(self):
-        return self.queryset.filter(conversation_participants=self.request.user)
+        return Message.objects.filter(conversation__participants=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(sender=self.request.user)

@@ -23,6 +23,11 @@ class IsParticipantOfConversation(permissions.BasePermission):
 
         # This is for message objects
         if hasattr(obj, 'conversation'):
-            return user in obj.conversation.participants.all()
+            is_participant =  user in obj.conversation.participants.all()
+
+            if request.method in ['PUT', 'PATCH', 'DELETE']:
+                return obj.sender == user and is_participant
+            return is_participant
+
         else:
             return False
