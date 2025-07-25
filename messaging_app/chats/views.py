@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsParticipantOfConversation
 from django_filters.rest_framework import DjangoFilterBackend
+from .filters import MessageFilter
 from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer, CreateMessageSerializer
 from django.shortcuts import get_object_or_404
@@ -37,7 +38,8 @@ class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated, IsParticipantOfConversation]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['sender', 'conversation']  # Allow filtering messages by conversation ID
+    filterset_fields = ['sender', 'conversation'] # Allow filtering messages by conversation ID
+    filterset_class = MessageFilter
 
     def get_serializer_class(self):
         if self.action == 'create':
