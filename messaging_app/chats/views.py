@@ -8,6 +8,7 @@ from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer, CreateMessageSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework.status import HTTP_403_FORBIDDEN
+from .pagination import MessagePagination
 
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
@@ -40,6 +41,7 @@ class MessageViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['sender', 'conversation'] # Allow filtering messages by conversation ID
     filterset_class = MessageFilter
+    pagination_class = MessagePagination
 
     def get_serializer_class(self):
         if self.action == 'create':
