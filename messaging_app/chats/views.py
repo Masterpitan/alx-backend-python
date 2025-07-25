@@ -1,6 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from .permissions import IsParticipantOfConversation
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer, CreateMessageSerializer
@@ -10,12 +11,12 @@ from django.shortcuts import get_object_or_404
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsParticipantOfConversation]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['participants']  # Filter by user ID in participants
 
     def get_queryset(self):
-        return Conversation.objects.filter(participants=self.request.user)
+        return self.request.filter(participants=self.request.user)
 
     def create(self, request, *args, **kwargs):
         participants = request.data.get('participants', [])
@@ -33,7 +34,8 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
-    permission_classes = [IsAuthenticated]
+    serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated, IsParticipantOfConversation]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['sender', 'conversation']  # Allow filtering messages by conversation ID
 
@@ -43,7 +45,7 @@ class MessageViewSet(viewsets.ModelViewSet):
         return MessageSerializer
 
     def get_queryset(self):
-        return Message.objects.filter(participants=self.request.user)
+        return self.queryset.filter(conversation_participants=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(sender=self.request.user)
