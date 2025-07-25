@@ -35,7 +35,7 @@ class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['conversation']  # Allow filtering messages by conversation ID
+    filterset_fields = ['sender', 'conversation']  # Allow filtering messages by conversation ID
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -43,7 +43,7 @@ class MessageViewSet(viewsets.ModelViewSet):
         return MessageSerializer
 
     def get_queryset(self):
-        return self.queryset.filter(conversation__participants=self.request.user)
+        return Message.objects.filter(participants=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(sender=self.request.user)
