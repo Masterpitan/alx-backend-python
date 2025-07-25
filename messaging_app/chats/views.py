@@ -6,7 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer, CreateMessageSerializer
 from django.shortcuts import get_object_or_404
-
+from rest_framework.status import HTTP_403_FORBIDDEN
 
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
@@ -48,7 +48,14 @@ class MessageViewSet(viewsets.ModelViewSet):
         return Message.objects.filter(conversation__participants=self.request.user)
 
     def perform_create(self, serializer):
+        conversation = serializer.validated_data['conversation']
+        if self.request.user not in conversation.participants.all():
+            raise Response(
+                {"detail": "You are not a participant of this conversation."},
+                status=HTTP_403_FORBIDDEN
+            )
         serializer.save(sender=self.request.user)
+
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
