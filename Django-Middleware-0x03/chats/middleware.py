@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 import time
 from django.http import JsonResponse
 from collections import defaultdict
@@ -70,3 +70,31 @@ class OffensiveLanguageMiddleware:
         else:
             ip = request.META.get('REMOTE_ADDR')
         return ip
+
+class RolePermissionMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+
+        protected_paths = ['/messages/', '/conversations/']
+
+        if any(path in request.path for path in protected_paths):
+            user = request.user
+
+            if not user.is_authenticated:
+                return JsonResponse(
+                    {"error": "Authentication required."},
+                    status=403
+                )
+
+            # Custom role check (assuming 'role' field is on User model)
+            user_role = getattr(user, 'role', None)
+
+            if user_role not in ['admin', 'moderator']:
+                return JsonResponse(
+                    {"error": "Access denied. Insufficient permissions."},
+                    status=403
+                )
+
+        return self.get_response(request)
