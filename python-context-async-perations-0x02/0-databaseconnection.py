@@ -8,7 +8,7 @@ class DatabaseConnection:
 
     def __enter__(self):
         self.conn = sqlite3.connect(self.db_name)
-        return self.conn  # Pass this to the with-block
+        return self.conn
 
     def __exit__(self, exc_type, exc_value, traceback):
         if self.conn:
