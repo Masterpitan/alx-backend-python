@@ -1,0 +1,7 @@
+<h2>Unread Messages</h2>
+{% for msg in messages %}
+    <p><strong>{{ msg.sender }}</strong>: {{ msg.content }} <br>
+    <small>{{ msg.timestamp }}</small></p>
+{% empty %}
+    <p>No unread messages.</p>
+{% endfor %}

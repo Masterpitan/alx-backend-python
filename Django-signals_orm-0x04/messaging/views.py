@@ -6,6 +6,7 @@ from .models import Message
 from django.db.models import Prefetch
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from .models import Message
 
 
 @login_required
@@ -52,3 +53,7 @@ def send_message(request):
 
     users = User.objects.exclude(id=request.user.id)
     return render(request, 'messaging/send_message.html', {'users': users})
+
+def unread_messages_view(request):
+    unread_messages = Message.unread.for_user(request.user)
+    return render(request, 'messaging/unread_messages.html', {'messages': unread_messages})
