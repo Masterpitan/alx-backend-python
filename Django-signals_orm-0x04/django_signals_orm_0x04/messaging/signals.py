@@ -3,7 +3,7 @@ from django.dispatch import receiver
 from .models import Message, Notification
 
 @receiver(post_save, sender=Message)
-def create_notification(sender, instance, created, **kwargs):
+def create_notification_on_new_message(sender, instance, created, **kwargs):
     if created:
         Notification.objects.create(
             user=instance.receiver,
