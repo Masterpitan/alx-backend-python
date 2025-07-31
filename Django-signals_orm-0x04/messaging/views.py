@@ -55,5 +55,5 @@ def send_message(request):
     return render(request, 'messaging/send_message.html', {'users': users})
 
 def unread_messages_view(request):
-    unread_messages = Message.unread.unread_for_user(request.user)
+    unread_messages = Message.unread.unread_for_user(request.user).only('id', 'sender', 'content', 'timestamp')
     return render(request, 'messaging/unread_messages.html', {'messages': unread_messages})
