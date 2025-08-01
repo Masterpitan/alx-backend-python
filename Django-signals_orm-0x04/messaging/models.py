@@ -17,6 +17,7 @@ class Message(models.Model):
         related_name='replies',
         on_delete=models.CASCADE
     )
+
     read = models.BooleanField(default=False)
 
     objects = models.Manager()  # default manager
