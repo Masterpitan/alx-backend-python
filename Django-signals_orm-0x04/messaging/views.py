@@ -7,8 +7,9 @@ from django.db.models import Prefetch
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from .models import Message
+from django.views.decorators.cache import cache_page
 
-
+@cache_page(60)
 @login_required
 def delete_user(request):
     user = request.user
@@ -42,7 +43,6 @@ def send_message(request):
             except Message.DoesNotExist:
                 pass  # Ignore invalid parent
 
-        # ✅ This is what the checker is looking for
         Message.objects.create(
             sender=request.user,
             receiver=receiver,

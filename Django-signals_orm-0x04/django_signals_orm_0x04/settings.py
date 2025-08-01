@@ -69,6 +69,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'django_signals_orm_0x04.wsgi.application'
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
