@@ -21,7 +21,7 @@ RUN pip install -r requirements.txt
 # Copy project files into container
 COPY . /app/
 
-# Expose Django’s default port
+# Expose Django’s default port -p
 EXPOSE 8000
 
 # Run server (you can adjust if using gunicorn later)
