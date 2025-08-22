@@ -8,9 +8,9 @@ services:
     env_file:
       - .env
     ports:
-      - "3307:3306"  # host:container (use 3307 locally to avoid conflicts)
+      - "3307:3306"   # host:container
     volumes:
-      - mysql_data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql   # ✅ persistent storage
 
   web:
     build: .
@@ -26,7 +26,8 @@ services:
       - db
 
 volumes:
-  mysql_data:
+  mysql_data:   # ✅ define named volume
+
 # python3 manage.py runserver
 # environment
 # ["MYSQL_USER", "MYSQL_DB", "MYSQL_PASSWORD"]
