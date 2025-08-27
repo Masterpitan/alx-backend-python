@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# kurbeScript.sh
+# Script to start a local Kubernetes cluster with Minikube and verify setup
+
+# starting the kubernetes cluster
+echo "🚀 Starting Minikube cluster..."
+minikube start --driver=docker
+
+# Step 2: Verify cluster is running
+echo "✅ Checking cluster status..."
+kubectl cluster-info
+
+# Step 3: List all pods in default namespace
+echo "📦 Retrieving available pods..."
+kubectl get pods --all-namespaces
