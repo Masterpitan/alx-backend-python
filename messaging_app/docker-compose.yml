@@ -3,31 +3,39 @@ version: "3.9"
 services:
   db:
     image: mysql:8.0
-    container_name: messaging_db
+    container_name: messaging_app_db
     restart: always
-    env_file:
-      - .env
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
-      - "3307:3306"   # host:container
+      - "3307:3306"   # Host port 3307 → Container 3306
     volumes:
-      - mysql_data:/var/lib/mysql   # ✅ persistent storage
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
   web:
     build: .
-    container_name: messaging_web
-    command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/app
+    container_name: messaging_app_web
+    restart: always
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
     ports:
       - "8000:8000"
-    env_file:
-      - .env
-    depends_on:
-      - db
+    volumes:
+      - .:/app
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
 
 volumes:
-  mysql_data:   # ✅ define named volume
-
-# python3 manage.py runserver
-# environment
-# ["MYSQL_USER", "MYSQL_DB", "MYSQL_PASSWORD"]
+  db_data:
