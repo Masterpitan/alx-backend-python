@@ -7,7 +7,7 @@
 echo "🚀 Starting Minikube cluster..."
 minikube start --driver=docker
 
-# Step 2: Verify cluster is running
+# Step 2: Verifying the cluster is running
 echo "✅ Checking cluster status..."
 kubectl cluster-info
 
