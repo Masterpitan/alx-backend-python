@@ -1,0 +1,17 @@
+#!/bin/bash
+# Deploy Blue version
+kubectl apply -f blue_deployment.yaml
+
+# Deploy Green version
+kubectl apply -f green_deployment.yaml
+
+# Apply Service (currently pointing to Blue)
+kubectl apply -f kubeservice.yaml
+
+# Show deployments and pods
+kubectl get deployments
+kubectl get pods -l app=messaging-app
+
+# Check logs for Green version (ensure no errors before switching traffic)
+GREEN_POD=$(kubectl get pods -l app=messaging-app,version=green -o jsonpath="{.items[0].metadata.name}")
+kubectl logs $GREEN_POD
