@@ -1,0 +1,27 @@
+#!/bin/bash
+# Script: kubctl-0x03
+# Objective: Perform a rolling update with zero downtime
+
+set -e
+
+echo ">>> Applying updated deployment (version 2.0)..."
+kubectl apply -f blue_deployment.yaml
+
+echo ">>> Triggering rolling update..."
+kubectl rollout status deployment/messaging-app-blue
+
+echo ">>> Continuously testing application availability during update..."
+# Replace with your service ClusterIP/NodePort/Ingress
+SERVICE_IP=$(minikube service messaging-app-service --url)
+
+for i in {1..20}; do
+  curl -s $SERVICE_IP || echo "Request failed"
+  sleep 2
+done
+
+echo ">>> Verifying rollout is complete..."
+kubectl get pods -l app=messaging-app,version=blue -o wide
+
+echo ">>> Current Deployment Image:"
+kubectl get deployment messaging-app-blue -o=jsonpath='{.spec.template.spec.containers[0].image}'
+echo -e "\n>>> Rolling update completed successfully!"
