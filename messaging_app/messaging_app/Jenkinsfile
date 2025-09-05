@@ -7,6 +7,8 @@ pipeline {
 
     environment {
         GITHUB_CREDENTIALS = credentials('github-credentials-id')
+        DOCKER_CREDENTIALS = credentials('dockerhub-credentials-id')
+        IMAGE_NAME = "Masterpitan/messaging_app"
     }
 
     stages {
@@ -21,7 +23,7 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                echo "Installing dependencies from messaging_app/requirements.txt..."
+                echo "Installing dependencies..."
                 sh '''
                     pip3 install --upgrade pip
                     pip3 install -r messaging_app/requirements.txt
@@ -32,7 +34,7 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                echo "Running pytest inside container..."
+                echo "Running pytest..."
                 sh '''
                     pytest messaging_app --junitxml=report.xml --html=report.html || true
                 '''
@@ -50,6 +52,31 @@ pipeline {
                     reportFiles: 'report.html',
                     reportName: 'Pytest HTML Report'
                 ])
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo "Building Docker image..."
+                sh '''
+                    docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} -f messaging_app/Dockerfile .
+                '''
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                echo "Pushing Docker image to Docker Hub..."
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials-id',
+                                                 usernameVariable: 'DOCKER_USER',
+                                                 passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push ${IMAGE_NAME}:${BUILD_NUMBER}
+                        docker tag ${IMAGE_NAME}:${BUILD_NUMBER} ${IMAGE_NAME}:latest
+                        docker push ${IMAGE_NAME}:latest
+                    '''
+                }
             }
         }
     }
