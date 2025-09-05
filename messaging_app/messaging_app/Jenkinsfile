@@ -1,8 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'python:3.10'   // container with Python
-            args '-u root:root'   // run as root to install extra packages
+            image 'python:3.10'
         }
     }
 
@@ -13,7 +12,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                echo "Cloning repo with GitHub credentials..."
+                echo "Cloning repository..."
                 git branch: 'main',
                     url: 'https://github.com/Masterpitan/alx-backend-python.git',
                     credentialsId: "${GITHUB_CREDENTIALS}"
@@ -22,25 +21,25 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                echo "Installing project dependencies..."
+                echo "Installing dependencies from messaging_app/requirements.txt..."
                 sh '''
-                    pip install --upgrade pip
-                    pip install -r requirements.txt
-                    pip install pytest pytest-html
+                    pip3 install --upgrade pip
+                    pip3 install -r messaging_app/requirements.txt
+                    pip3 install pytest pytest-html
                 '''
             }
         }
 
         stage('Run Tests') {
             steps {
-                echo "Running pytest inside Docker container..."
+                echo "Running pytest inside container..."
                 sh '''
-                    pytest --junitxml=report.xml --html=report.html || true
+                    pytest messaging_app --junitxml=report.xml --html=report.html || true
                 '''
             }
         }
 
-        stage('Publish Test Reports') {
+        stage('Publish Reports') {
             steps {
                 junit 'report.xml'
                 publishHTML([
