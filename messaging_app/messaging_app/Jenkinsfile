@@ -1,0 +1,64 @@
+pipeline {
+    agent {
+        docker {
+            image 'python:3.10'   // container with Python
+            args '-u root:root'   // run as root to install extra packages
+        }
+    }
+
+    environment {
+        GITHUB_CREDENTIALS = credentials('github-credentials-id')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo "Cloning repo with GitHub credentials..."
+                git branch: 'main',
+                    url: 'https://github.com/Masterpitan/alx-backend-python.git',
+                    credentialsId: "${GITHUB_CREDENTIALS}"
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                echo "Installing project dependencies..."
+                sh '''
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                    pip install pytest pytest-html
+                '''
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                echo "Running pytest inside Docker container..."
+                sh '''
+                    pytest --junitxml=report.xml --html=report.html || true
+                '''
+            }
+        }
+
+        stage('Publish Test Reports') {
+            steps {
+                junit 'report.xml'
+                publishHTML([
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: '.',
+                    reportFiles: 'report.html',
+                    reportName: 'Pytest HTML Report'
+                ])
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Cleaning workspace..."
+            cleanWs()
+        }
+    }
+}
